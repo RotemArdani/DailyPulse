@@ -1,13 +1,16 @@
 package com.colman.dailypulse.data.firebase
 
 import co.touchlab.kermit.Logger
-import com.colman.dailypulse.models.Habit
-import com.colman.dailypulse.models.Habits
-import com.colman.dailypulse.models.Post
-import com.colman.dailypulse.models.Posts
+import com.colman.dailypulse.models.habits.Habit
+import com.colman.dailypulse.models.habits.Habits
+import com.colman.dailypulse.models.posts.Post
+import com.colman.dailypulse.models.posts.Posts
+import com.colman.dailypulse.models.users.User
+import com.colman.dailypulse.utils.Cloudinary
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
+import kotlinx.datetime.Clock
 
 class RemoteFirebaseRepository: FirebaseRepository {
 
@@ -29,6 +32,7 @@ class RemoteFirebaseRepository: FirebaseRepository {
 
     override suspend fun createPost(post: Post) {
         val userId = auth.currentUser?.uid ?: return
+//        val cloudinary = Cloudinary()
 
         val postsCollection = firestore
             .collection("posts")
@@ -37,6 +41,32 @@ class RemoteFirebaseRepository: FirebaseRepository {
 
         val docRef = postsCollection.add(postWithUserId)
         docRef.set(post.copy(id = docRef.id))
+    }
+
+    override suspend fun signUpUser(email: String, password: String, name: String) {
+
+            val authResult = auth.createUserWithEmailAndPassword(email, password)
+            val user = authResult.user ?: return
+
+            val userData = User(user.uid, name, email)
+
+            firestore.collection("users")
+                .document(user.uid)
+                .set(userData)
+    }
+
+    override suspend fun signInUser(email: String, password: String): User? {
+            val authResult = Firebase.auth.signInWithEmailAndPassword(email, password)
+            val user = authResult.user ?: return null
+
+            val doc = Firebase.firestore
+                .collection("users")
+                .document(user.uid)
+                .get()
+
+            val data = doc.data<User>()
+
+            return data;
     }
 
     override suspend fun updateHabit(habit: Habit) {

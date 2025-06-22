@@ -2,8 +2,7 @@ package com.colman.dailypulse.data.habit
 
 import com.colman.dailypulse.data.Error
 import com.colman.dailypulse.data.Result
-import com.colman.dailypulse.data.habits.HabitsRepository
-import com.colman.dailypulse.models.Habit
+import com.colman.dailypulse.models.habits.Habit
 import io.ktor.client.HttpClient
 
 class RemoteHabitRepository(

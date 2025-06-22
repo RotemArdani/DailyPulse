@@ -1,6 +1,5 @@
-package com.colman.dailypulse.models
+package com.colman.dailypulse.models.habits
 
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant

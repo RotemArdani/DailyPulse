@@ -1,6 +1,6 @@
 package com.colman.dailypulse.features.posts
 
-import com.colman.dailypulse.models.Posts
+import com.colman.dailypulse.models.posts.Posts
 
 public sealed class PostsState {
     data object Loading: PostsState()

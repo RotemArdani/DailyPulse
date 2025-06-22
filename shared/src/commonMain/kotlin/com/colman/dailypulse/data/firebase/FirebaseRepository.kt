@@ -1,17 +1,23 @@
 package com.colman.dailypulse.data.firebase
 
-import com.colman.dailypulse.models.Habit
-import com.colman.dailypulse.models.Habits
-import com.colman.dailypulse.models.Post
-import com.colman.dailypulse.models.Posts
+import com.colman.dailypulse.models.habits.Habit
+import com.colman.dailypulse.models.habits.Habits
+import com.colman.dailypulse.models.posts.Post
+import com.colman.dailypulse.models.posts.Posts
+import com.colman.dailypulse.models.users.User
 
 interface FirebaseRepository {
+    suspend fun getHabits(): Habits
     suspend fun createHabit(habit: Habit)
-    suspend fun createPost(post: Post)
     suspend fun getHabitDetails(habitId: String): Habit?
     suspend fun deleteHabit(habit: Habit)
-    suspend fun getHabits(): Habits
-    suspend fun getPosts(): Posts
-    suspend fun signInAnonymously()
     suspend fun updateHabit(habit: Habit)
+
+    suspend fun getPosts(): Posts
+    suspend fun createPost(post: Post)
+
+    suspend fun signInAnonymously()
+
+    suspend fun signUpUser(email: String, password: String, name: String)
+    suspend fun signInUser(email: String, password: String): User?
 }

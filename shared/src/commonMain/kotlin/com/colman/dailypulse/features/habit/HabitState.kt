@@ -1,6 +1,6 @@
 package com.colman.dailypulse.features.habit
 
-import com.colman.dailypulse.models.Habit
+import com.colman.dailypulse.models.habits.Habit
 
 public sealed class HabitState {
     data object Loading: HabitState()

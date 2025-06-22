@@ -3,8 +3,8 @@ package com.colman.dailypulse.data.habits
 import com.colman.dailypulse.data.Error
 import com.colman.dailypulse.data.Result
 import com.colman.dailypulse.data.firebase.FirebaseRepository
-import com.colman.dailypulse.models.Habit
-import com.colman.dailypulse.models.Habits
+import com.colman.dailypulse.models.habits.Habit
+import com.colman.dailypulse.models.habits.Habits
 import kotlinx.serialization.Serializable
 
 data class HabitsError (

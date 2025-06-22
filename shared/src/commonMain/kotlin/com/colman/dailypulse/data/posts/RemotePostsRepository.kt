@@ -4,9 +4,8 @@ import com.colman.dailypulse.data.Error
 import com.colman.dailypulse.data.Result
 import com.colman.dailypulse.data.firebase.FirebaseRepository
 import com.colman.dailypulse.data.habits.HabitsError
-import com.colman.dailypulse.models.Habit
-import com.colman.dailypulse.models.Post
-import com.colman.dailypulse.models.Posts
+import com.colman.dailypulse.models.posts.Post
+import com.colman.dailypulse.models.posts.Posts
 
 data class PostsError (
     override val message: String

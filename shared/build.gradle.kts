@@ -54,6 +54,7 @@ kotlin {
             implementation(libs.koin.test)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.gitlive.firebase.firestore)
+            implementation(libs.cloudinary.android)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

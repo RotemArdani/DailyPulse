@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.colman.dailypulse.features.habits.HabitsState
 import com.colman.dailypulse.features.habits.HabitsViewModel
-import com.colman.dailypulse.models.Habit
-import com.colman.dailypulse.models.Habits
+import com.colman.dailypulse.models.habits.Habit
+import com.colman.dailypulse.models.habits.Habits
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

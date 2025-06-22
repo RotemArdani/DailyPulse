@@ -1,5 +1,6 @@
-package com.colman.dailypulse.models
+package com.colman.dailypulse.models.posts
 
+import com.colman.dailypulse.models.habits.Habit
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable

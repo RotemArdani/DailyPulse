@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.colman.dailypulse.navigation.AppNavigation
 import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +20,9 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         setContent {
             MaterialTheme {
-                HabitsScreen()
+//                SignInScreen()
+//                SignUpScreen()
+                AppNavigation()
             }
         }
     }
