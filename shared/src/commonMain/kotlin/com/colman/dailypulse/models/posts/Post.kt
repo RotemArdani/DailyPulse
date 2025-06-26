@@ -9,9 +9,9 @@ import kotlinx.serialization.Serializable
 data class Post(
     val id: String? = "",
 
-    val createdByUserId: String, // ID of the user who created the post
+    val createdByUserId: String = "",
 
-    val habitSnapshot: Habit?,
+    val habitSnapshot: Habit? = null,
 
     val description: String,
 
@@ -19,5 +19,7 @@ data class Post(
 
     val likedByUserIds: List<String> = emptyList(),
 
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+
+    val authorName: String? = ""
 )

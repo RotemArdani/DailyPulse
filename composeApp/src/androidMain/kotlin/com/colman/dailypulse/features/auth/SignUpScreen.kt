@@ -1,4 +1,4 @@
-package com.colman.dailypulse
+package com.colman.dailypulse.features.auth
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions

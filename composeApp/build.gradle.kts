@@ -24,6 +24,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.androidx.work.runtime.ktx)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -86,5 +87,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.cloudinary.android)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.coil.compose)
+    implementation(libs.firebase.auth.ktx)
 }
 

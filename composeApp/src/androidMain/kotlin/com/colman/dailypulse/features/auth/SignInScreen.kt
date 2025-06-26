@@ -1,4 +1,4 @@
-package com.colman.dailypulse
+package com.colman.dailypulse.features.auth
 
 // SignInScreen.kt
 //package com.colman.dailypulse.features.user.ui // Or your preferred UI package

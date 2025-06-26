@@ -35,4 +35,15 @@ class RemotePostsRepository(
             )
         }
     }
+
+    override suspend fun likePost(postId: String): Result<String, Error> {
+        return try {
+            firebaseRepository.likePost(postId);
+            Result.Success("")
+        } catch (e: Exception) {
+            Result.Failure(
+                HabitsError(message = e.message ?: "")
+            )
+        }
+    }
 }

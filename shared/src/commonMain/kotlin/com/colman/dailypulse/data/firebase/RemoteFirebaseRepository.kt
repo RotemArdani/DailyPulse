@@ -6,7 +6,6 @@ import com.colman.dailypulse.models.habits.Habits
 import com.colman.dailypulse.models.posts.Post
 import com.colman.dailypulse.models.posts.Posts
 import com.colman.dailypulse.models.users.User
-import com.colman.dailypulse.utils.Cloudinary
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
@@ -32,7 +31,6 @@ class RemoteFirebaseRepository: FirebaseRepository {
 
     override suspend fun createPost(post: Post) {
         val userId = auth.currentUser?.uid ?: return
-//        val cloudinary = Cloudinary()
 
         val postsCollection = firestore
             .collection("posts")
@@ -40,7 +38,25 @@ class RemoteFirebaseRepository: FirebaseRepository {
         val postWithUserId = post.copy(createdByUserId = userId)
 
         val docRef = postsCollection.add(postWithUserId)
-        docRef.set(post.copy(id = docRef.id))
+        docRef.set(postWithUserId.copy(id = docRef.id))
+    }
+
+    override suspend fun likePost(postId: String) {
+        val userId = auth.currentUser?.uid ?: return
+
+        val postRef = firestore
+            .collection("posts")
+            .document(postId)
+
+        val post = postRef.get().data<Post>()
+
+        val updatedLikes = if (userId in post.likedByUserIds) {
+            post.likedByUserIds - userId
+        } else {
+            post.likedByUserIds + userId
+        }
+
+        postRef.set((post.copy(likedByUserIds = updatedLikes)))
     }
 
     override suspend fun signUpUser(email: String, password: String, name: String) {
@@ -69,16 +85,30 @@ class RemoteFirebaseRepository: FirebaseRepository {
             return data;
     }
 
-    override suspend fun updateHabit(habit: Habit) {
+        override suspend fun updateHabit(habit: Habit) {
         val userId = auth.currentUser?.uid ?: return
-        val habitId = habit.id ?: return // Don't proceed if ID is missing
+        val habitId = habit.id ?: return
 
         val habitRef = firestore
             .collection("users")
             .document(userId)
             .collection("habits").document(habitId)
 
-        habitRef.set(habit) // Overwrites the document with the new post data
+        habitRef.set(habit)
+    }
+
+    override suspend fun habitDone(habitId: String) {
+        val userId = auth.currentUser?.uid ?: return
+
+        val habitRef = firestore
+            .collection("users")
+            .document(userId)
+            .collection("habits")
+            .document(habitId)
+
+        val habit = habitRef.get().data<Habit>()
+
+        habitRef.set((habit.copy(totalCount = habit.totalCount?.plus(1), lastModified = Clock.System.now())))
     }
 
 
@@ -112,7 +142,14 @@ class RemoteFirebaseRepository: FirebaseRepository {
             documentSnapshot.data<Post>()
         }
 
-        return Posts(items = postsList)
+        val postsWithAuthorName = postsList.map { post ->
+            val userDoc = firestore.collection("users").document(post.createdByUserId).get()
+            val user = userDoc.data<User>()
+            val userName = user.name ?: "Unknown"
+            post.copy(authorName = userName)
+        }
+
+        return Posts(items = postsWithAuthorName)
     }
 
     override suspend fun signInAnonymously() {

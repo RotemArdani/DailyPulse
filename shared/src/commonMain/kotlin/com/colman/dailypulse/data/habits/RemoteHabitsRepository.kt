@@ -46,6 +46,17 @@ class RemoteHabitsRepository(
             )
         }
     }
+
+    override suspend fun habitDone(habitId: String): Result<String, Error> {
+        return try {
+            firebaseRepository.habitDone(habitId);
+            Result.Success("")
+        } catch (e: Exception) {
+            Result.Failure(
+                HabitsError(message = e.message ?: "")
+            )
+        }
+    }
 }
 
 @Serializable

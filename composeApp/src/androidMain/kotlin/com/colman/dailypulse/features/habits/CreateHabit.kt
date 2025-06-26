@@ -1,4 +1,4 @@
-package com.colman.dailypulse
+package com.colman.dailypulse.features.habits
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -49,8 +49,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.colman.dailypulse.features.habits.HabitsViewModel
-import com.colman.dailypulse.features.habits.SaveState
 import com.colman.dailypulse.models.habits.Habit
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek

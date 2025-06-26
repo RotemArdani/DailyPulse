@@ -36,6 +36,7 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            implementation(libs.cloudinary.android.v200)
         }
 
         commonMain.dependencies {
@@ -54,7 +55,6 @@ kotlin {
             implementation(libs.koin.test)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.gitlive.firebase.firestore)
-            implementation(libs.cloudinary.android)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -10,8 +10,12 @@ androidx-core = "1.16.0"
 androidx-espresso = "3.6.1"
 androidx-lifecycle = "2.9.0"
 androidx-testExt = "1.2.1"
+charts = "1.0.0-alpha03"
 cloudinaryAndroid = "2.4.0"
+cloudinaryAndroidVersion = "2.0.0"
+coilCompose = "2.5.0"
 composeMultiplatform = "1.8.1"
+firebaseAuthKtx = "22.3.0"
 firebaseBom = "33.14.0"
 firebaseCommonKtx = "21.0.0"
 firebaseFirestore = "2.1.0"
@@ -40,6 +44,7 @@ places = "4.3.1"
 protoliteWellKnownTypes = "18.0.1"
 identityJvm = "202411.1"
 firebaseFirestoreKtx = "25.1.4"
+workRuntimeKtx = "2.9.0"
 
 [libraries]
 androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
@@ -49,8 +54,13 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 androidx-ui-graphics = { module = "androidx.compose.ui:ui-graphics", version.ref = "uiGraphics" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+charts = { module = "io.github.tehras:charts", version.ref = "charts" }
 cloudinary-android = { module = "com.cloudinary:cloudinary-android", version.ref = "cloudinaryAndroid" }
+cloudinary-android-v200 = { module = "com.cloudinary:cloudinary-android", version.ref = "cloudinaryAndroidVersion" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseFirestore" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseFirestore" }
 firebase-common-ktx = { module = "com.google.firebase:firebase-common-ktx", version.ref = "firebaseCommonKtx" }

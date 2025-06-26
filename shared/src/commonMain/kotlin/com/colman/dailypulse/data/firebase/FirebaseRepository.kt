@@ -12,9 +12,11 @@ interface FirebaseRepository {
     suspend fun getHabitDetails(habitId: String): Habit?
     suspend fun deleteHabit(habit: Habit)
     suspend fun updateHabit(habit: Habit)
+    suspend fun habitDone(habitId: String)
 
     suspend fun getPosts(): Posts
     suspend fun createPost(post: Post)
+    suspend fun likePost(postId: String)
 
     suspend fun signInAnonymously()
 
