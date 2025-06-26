@@ -72,10 +72,11 @@ fun CreateHabitScreen(
     var frequencyInput by remember { mutableStateOf("1") }
     var frequencyError by remember { mutableStateOf<String?>(null) }
 
-    val saveState by viewModel.saveState.collectAsState() // Observe save operation state
+    val saveState by viewModel.saveState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var hasAttemptedSave by remember { mutableStateOf(false) } // To show validation errors after first try
+    var hasAttemptedSave by remember { mutableStateOf(false) } // To show validation
+    // errors after first try
 
     // Handle save state changes
     LaunchedEffect(saveState) {
