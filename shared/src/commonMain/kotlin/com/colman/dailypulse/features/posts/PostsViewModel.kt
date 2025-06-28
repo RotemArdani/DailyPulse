@@ -83,8 +83,8 @@ class PostsViewModel(
 
             when (val result = useCases.createPost(Post(imageUrl = imageUrl.value, description = description.value))) {
                 is Result.Success -> {
-                    _saveState.value = SaveState.Success
                     fetchPosts()
+                    _saveState.value = SaveState.Success
                 }
                 is Result.Failure -> {
                     _saveState.value = SaveState.Error(result.error?.message ?: "Unknown error")
@@ -127,6 +127,10 @@ class PostsViewModel(
     fun resetSaveState() {
         _saveState.value = SaveState.Idle
         _description.value = ""
+        _imageUrl.value = null
+    }
+
+    fun clearImage() {
         _imageUrl.value = null
     }
 }

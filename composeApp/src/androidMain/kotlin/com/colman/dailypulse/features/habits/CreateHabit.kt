@@ -50,6 +50,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.colman.dailypulse.models.habits.Habit
+import com.colman.dailypulse.utils.LocalSnackbarController
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import org.koin.androidx.compose.koinViewModel
@@ -60,9 +61,8 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateHabitScreen(
-    // Assuming HabitsViewModel is used. If you have a dedicated CreateHabitViewModel, use that.
     viewModel: HabitsViewModel = koinViewModel(),
-//    onHabitCreatedSuccessfully: () -> Unit,
+    onSuccess: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var title by remember { mutableStateOf("") }
@@ -71,35 +71,27 @@ fun CreateHabitScreen(
     var frequencyError by remember { mutableStateOf<String?>(null) }
 
     val saveState by viewModel.saveState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarController = LocalSnackbarController.current;
 
     var hasAttemptedSave by remember { mutableStateOf(false) } // To show validation
-    // errors after first try
 
-    // Handle save state changes
     LaunchedEffect(saveState) {
         when (val currentSaveState = saveState) {
             is SaveState.Success -> {
-                snackbarHostState.showSnackbar("Habit created successfully!")
-                // Reset local screen state if needed, though usually navigation handles this
+                snackbarController.showMessage("Habit created successfully!")
                 title = ""
                 selectedDays = emptySet()
                 hasAttemptedSave = false
                 frequencyError = "1"
-                // ViewModel state should also be reset by the ViewModel or before navigating
-                // viewModel.resetSaveHabitState() // Ensure this is called
-//                onHabitCreatedSuccessfully()
+                onSuccess()
             }
             is SaveState.Error -> {
-                snackbarHostState.showSnackbar("Error: ${currentSaveState.errorMessage}")
-                // ViewModel should ideally reset its state to allow another attempt.
-                // viewModel.resetSaveHabitState()
+                snackbarController.showMessage("Error: ${currentSaveState.errorMessage}")
             }
             else -> { /* Idle or Saving */ }
         }
     }
 
-    // Reset ViewModel's save state when the screen is disposed if not successful
     DisposableEffect(Unit) {
         onDispose {
             if (saveState !is SaveState.Success) {
@@ -109,7 +101,6 @@ fun CreateHabitScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Create New Habit") },
@@ -132,11 +123,11 @@ fun CreateHabitScreen(
                                 frequencyError = "Frequency must be a positive number."
                                 // Also show a snackbar for general validation failure
                                 kotlinx.coroutines.MainScope().launch {
-                                    snackbarHostState.showSnackbar("Please correct the errors.")
+                                    snackbarController.showMessage("Please correct the errors.")
                                 }
-                                return@IconButton // Stop the save process
+                                return@IconButton
                             } else {
-                                frequencyError = null // Clear error if valid now
+                                frequencyError = null
                             }
 
 
@@ -145,20 +136,18 @@ fun CreateHabitScreen(
                                     id = null,
                                     title = title.trim(),
                                     daysOfWeek = selectedDays,
-                                    frequency = currentFrequency, // Use the parsed frequency
+                                    frequency = currentFrequency,
                                     dailyCount = 0,
                                     totalCount = 0,
                                 )
                                 viewModel.onCreateHabit(newHabit)
                             } else {
-                                // Validation error feedback is handled by conditional Text below fields
-                                // and the Snackbar on first validation failure.
-                                kotlinx.coroutines.MainScope().launch { // Use MainScope for quick UI feedback
-                                    snackbarHostState.showSnackbar("Title and at least one day are required.")
+                                kotlinx.coroutines.MainScope().launch {
+                                    snackbarController.showMessage("Title and at least one day are required.")
                                 }
                             }
                         },
-                        enabled = saveState !is SaveState.Saving // Disable while saving
+                        enabled = saveState !is SaveState.Saving
                     )
                     { Icon(Icons.Filled.Check, contentDescription = "Save Habit") }
                 }
@@ -183,7 +172,7 @@ fun CreateHabitScreen(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Next
                 ),
-                isError = title.isBlank() && hasAttemptedSave // Show error if blank after trying to save
+                isError = title.isBlank() && hasAttemptedSave
             )
             if (title.isBlank() && hasAttemptedSave) {
                 Text(
@@ -195,7 +184,6 @@ fun CreateHabitScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Days of the Week Selector
             Text("Repeat on Days*", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
             DayOfWeekSelector(
@@ -213,7 +201,7 @@ fun CreateHabitScreen(
                     "Please select at least one day.",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp, top = 4.dp) // Complete this line
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                 )
             }
 
@@ -223,18 +211,15 @@ fun CreateHabitScreen(
             OutlinedTextField(
                 value = frequencyInput,
                 onValueChange = { newValue ->
-                    // Allow only digits and ensure it's not empty, or handle empty as error
                     if (newValue.all { it.isDigit() }) {
                         frequencyInput = newValue
-                        // Basic validation: ensure it's a positive number when attempting save
-                        // More robust validation can be done on save attempt
-                        frequencyError = if (newValue.toIntOrNull() ?: 0 <= 0) {
+                        frequencyError = if ((newValue.toIntOrNull() ?: 0) <= 0) {
                             "Must be a positive number"
                         } else {
                             null
                         }
                     } else if (newValue.isEmpty()) {
-                        frequencyInput = "" // Allow clearing the field
+                        frequencyInput = ""
                         frequencyError = "Frequency cannot be empty"
                     }
                 },
@@ -243,7 +228,7 @@ fun CreateHabitScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done // Or ImeAction.Next if more fields follow
+                    imeAction = ImeAction.Done
                 ),
                 isError = (frequencyInput.isBlank() && hasAttemptedSave) || frequencyError != null
             )
@@ -263,14 +248,9 @@ fun CreateHabitScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp)) // Spacer after this section
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.height(24.dp)) // Add some space at the bottom
-
-            // You could add more fields here like:
-            // - Frequency (Daily, Specific Days, X times per week)
-            // - Daily Target (e.g., number of times, minutes)
-            // - Reminders
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -281,7 +261,6 @@ fun DayOfWeekSelector(
     selectedDays: Set<DayOfWeek>,
     onDaySelected: (DayOfWeek, Boolean) -> Unit
 ) {
-    // Get all days of the week, starting from Monday to Sunday for common representation
     val days = remember {
         listOf(
             DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,
@@ -291,7 +270,7 @@ fun DayOfWeekSelector(
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceAround // Distribute space evenly
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         days.forEach { day ->
             val isSelected = selectedDays.contains(day)
@@ -318,7 +297,7 @@ private fun DayButton(
 
     Box(
         modifier = modifier
-            .size(40.dp) // Fixed size for a circular button
+            .size(40.dp)
             .clip(CircleShape)
             .background(backgroundColor)
             .border(1.dp, borderColor, CircleShape)
@@ -326,7 +305,7 @@ private fun DayButton(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()).first().toString(), // e.g., "M"
+            text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()).first().toString(),
             color = contentColor,
             style = MaterialTheme.typography.labelLarge,
             textAlign = TextAlign.Center

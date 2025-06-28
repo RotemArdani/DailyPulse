@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -28,9 +30,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.colman.dailypulse.models.habits.Habit
+import com.colman.dailypulse.utils.LocalSnackbarController
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
@@ -65,19 +65,16 @@ fun Habits(
     var currentIndex by remember { mutableStateOf(0) }
     val uiState = viewModel.uiState.collectAsState().value
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarController = LocalSnackbarController.current
 
     LaunchedEffect(Unit) {
         viewModel.snackbarMessage.collect { msg ->
-            snackbarHostState.showSnackbar(msg)
+            snackbarController.showMessage(msg)
         }
     }
 
     val today = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.dayOfWeek }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) {
         when(uiState) {
             is HabitsState.Error -> ErrorContent(message = uiState.errorMessage)
             is HabitsState.Loaded -> HabitsContent(
@@ -91,7 +88,6 @@ fun Habits(
             HabitsState.Loading -> LoadingContent()
         }
     }
-}
 
 @Composable
 fun HabitsContent(
@@ -110,12 +106,10 @@ fun HabitsContent(
                 detectHorizontalDragGestures { _, dragAmount ->
                     when {
                         dragAmount < -30 && currentIndex < habits.lastIndex -> {
-                            // Swiped left → go forward
                             onIndexChange(currentIndex + 1)
                         }
 
                         dragAmount > 30 && currentIndex > 0 -> {
-                            // Swiped right → go backward
                             onIndexChange(currentIndex - 1)
                         }
                     }
@@ -194,7 +188,7 @@ fun HabitsContent(
                 onClick = { onIndexChange(currentIndex - 1) },
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Previous")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
             }
         }
 
@@ -203,7 +197,7 @@ fun HabitsContent(
                 onClick = { onIndexChange(currentIndex + 1) },
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Next")
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
             }
         }
 

@@ -28,6 +28,13 @@ fun PostCard(
     isLiked: Boolean,
     onLikeClick: () -> Unit
 ) {
+    val transformedImageUrl = post.imageUrl?.let {
+        val parts = it.split("/upload/")
+        if (parts.size == 2) {
+            "${parts[0]}/upload/c_pad,b_gray,w_800,h_800/${parts[1]}"
+        } else it
+    }
+
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = post.authorName?: "Unknown", fontWeight = FontWeight.Bold)
@@ -36,11 +43,10 @@ fun PostCard(
             Spacer(Modifier.height(8.dp))
 
             post.imageUrl?.let {
-                // Platform-specific image composable
                 AsyncImage(
-                    model = it,
+                    model = transformedImageUrl,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    modifier = Modifier.fillMaxWidth().height(300.dp),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(8.dp))

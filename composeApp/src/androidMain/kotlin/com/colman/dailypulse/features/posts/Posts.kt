@@ -12,9 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,6 +23,7 @@ import com.colman.dailypulse.features.habits.ErrorContent
 import com.colman.dailypulse.features.habits.LoadingContent
 import com.colman.dailypulse.models.posts.Post
 import com.colman.dailypulse.models.posts.Posts
+import com.colman.dailypulse.utils.LocalSnackbarController
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.compose.koinViewModel
 
@@ -37,17 +35,14 @@ fun PostsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val userId = remember { FirebaseAuth.getInstance().currentUser?.uid }
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarController = LocalSnackbarController.current
 
     LaunchedEffect(Unit) {
         viewModel.snackbarMessage.collect { msg ->
-            snackbarHostState.showSnackbar(msg)
+            snackbarController.showMessage(msg)
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) {
         when (uiState) {
         is PostsState.Error -> ErrorContent(message = uiState.errorMessage)
         is PostsState.Loaded -> PostsContent(
@@ -58,7 +53,6 @@ fun PostsScreen(
         )
 
         PostsState.Loading -> LoadingContent()
-    }
     }
 }
 
