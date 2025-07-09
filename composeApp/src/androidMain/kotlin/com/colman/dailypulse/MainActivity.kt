@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.colman.dailypulse.navigation.AppNavigation
 import com.google.firebase.FirebaseApp
+import com.colman.dailypulse.ui.theme.DailyPulseTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
 
         FirebaseApp.initializeApp(this)
         setContent {
-            MaterialTheme {
+            DailyPulseTheme {
                 AppNavigation()
             }
         }

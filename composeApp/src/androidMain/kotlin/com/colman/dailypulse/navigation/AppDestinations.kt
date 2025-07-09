@@ -6,6 +6,7 @@ object AppDestinations {
     const val MAIN_APP_CONTENT_ROUTE = "main" // Example for your main app screen after login
     const val CREATE_POST_ROUTE = "createPost"
     const val CREATE_HABIT_ROUTE = "createHabit"
+    const val EDIT_HABIT_ROUTE = "editHabit"
     const val POSTS_ROUTE = "posts"
     const val HABITS_ROUTE = "habits"
     // Add other routes as needed

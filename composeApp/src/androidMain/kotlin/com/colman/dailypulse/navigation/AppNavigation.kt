@@ -37,9 +37,12 @@ import androidx.navigation.compose.rememberNavController
 import com.colman.dailypulse.features.auth.SignInScreen
 import com.colman.dailypulse.features.auth.SignUpScreen
 import com.colman.dailypulse.features.habits.CreateHabitScreen
+import com.colman.dailypulse.features.habits.EditHabitScreen
 import com.colman.dailypulse.features.habits.Habits
 import com.colman.dailypulse.features.posts.CreatePostScreen
 import com.colman.dailypulse.features.posts.PostsScreen
+import com.colman.dailypulse.ui.components.AppHeader
+import com.colman.dailypulse.ui.components.InsideAppHeader
 import com.colman.dailypulse.utils.LocalSnackbarController
 import com.colman.dailypulse.utils.SnackbarController
 import com.google.firebase.auth.FirebaseAuth
@@ -70,15 +73,15 @@ fun AppNavigation() {
 
     Scaffold(
         topBar = {
-            if (!invisibleBottomBar) {
+            if (!invisibleBottomBar) { // invisible to sign in, sign up
                 TopAppBar(
                     title = {
-                        Box(Modifier.fillMaxWidth()) {
-                            Text(
-                                text = "DailyPulse",
-                                modifier = Modifier.align(Alignment.Center),
-                                style = MaterialTheme.typography.titleLarge
-                            )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            InsideAppHeader()
                         }
                     },
                     actions = {
@@ -95,7 +98,7 @@ fun AppNavigation() {
                 )
             }
         },
-        bottomBar = {
+        bottomBar = { // invisible to sign in, sign up
             if (!invisibleBottomBar) {
                 NavigationBar {
                     NavigationBarItem(
@@ -186,14 +189,6 @@ fun AppNavigation() {
                 )
             }
 
-            composable(AppDestinations.HABITS_ROUTE) {
-                Habits(
-                    onCreateHabitClick = {
-                        navController.navigate(AppDestinations.CREATE_HABIT_ROUTE)
-                    }
-                )
-            }
-
             composable(AppDestinations.CREATE_POST_ROUTE) {
                 CreatePostScreen(
                     onNavigateBack = { navController.popBackStack() },
@@ -204,6 +199,23 @@ fun AppNavigation() {
                     }
                 )
             }
+
+            composable(AppDestinations.HABITS_ROUTE) {
+                Habits(
+                    onCreateHabitClick = {
+                        navController.navigate(AppDestinations.CREATE_HABIT_ROUTE)
+                    },
+                    onEditHabitClick = { habit ->
+                        navController.navigate("${AppDestinations.EDIT_HABIT_ROUTE}/${habit.id}")
+                    },
+                    onNavigateBack = {
+                        navController.navigate(AppDestinations.HABITS_ROUTE) {
+                            popUpTo(AppDestinations.HABITS_ROUTE) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
 
             composable(AppDestinations.CREATE_HABIT_ROUTE) {
                 CreateHabitScreen(
@@ -216,6 +228,21 @@ fun AppNavigation() {
 
                 )
             }
+
+            composable("${AppDestinations.EDIT_HABIT_ROUTE}/{habitId}") { backStackEntry ->
+                val habitId = backStackEntry.arguments?.getString("habitId")
+
+                EditHabitScreen(
+                    habitId = habitId,
+                    onNavigateBack = { navController.popBackStack() },
+                    onSuccess = {
+                        navController.navigate(AppDestinations.HABITS_ROUTE) {
+                            popUpTo(AppDestinations.HABITS_ROUTE) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
         }
     }
     }

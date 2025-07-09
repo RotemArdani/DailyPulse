@@ -13,6 +13,7 @@ import com.colman.dailypulse.features.user.UserViewModel
 import com.colman.dailypulse.features.habits.SaveState // Assuming SaveState is reused
 import com.colman.dailypulse.utils.LocalSnackbarController
 import org.koin.androidx.compose.koinViewModel // If using Koin
+import com.colman.dailypulse.ui.components.AppHeader
 
 @Composable
 fun SignInScreen(
@@ -47,6 +48,9 @@ fun SignInScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            AppHeader()
+            Spacer(modifier = Modifier.height(48.dp))
+
             Text("Sign In", style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(24.dp))
 

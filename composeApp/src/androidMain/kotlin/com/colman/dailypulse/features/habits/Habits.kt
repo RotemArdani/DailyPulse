@@ -60,7 +60,12 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun Habits(
     viewModel: HabitsViewModel = koinViewModel(),
-    onCreateHabitClick: () -> Unit
+    onCreateHabitClick: () -> Unit,
+    onEditHabitClick: (Habit) -> Unit,
+    onNavigateBack: () -> Unit
+/*
+    onDeleteHabitClick: (Habit) -> Unit
+*/
 ) {
     var currentIndex by remember { mutableStateOf(0) }
     val uiState = viewModel.uiState.collectAsState().value
@@ -83,6 +88,11 @@ fun Habits(
                 onIndexChange = { currentIndex = it },
                 today,
                 onCreateHabitClick,
+                onEditHabitClick = onEditHabitClick,
+                onDeleteHabit = { habit -> viewModel.onDeleteHabit(habit) {
+                        onNavigateBack()
+                    }
+                },
                 onHabitDone = {habit -> viewModel.onHabitDone(habit.id?: "")}
             )
             HabitsState.Loading -> LoadingContent()
@@ -96,108 +106,116 @@ fun HabitsContent(
     onIndexChange: (Int) -> Unit,
     today: DayOfWeek,
     onCreateHabitClick: () -> Unit,
+    onEditHabitClick: (Habit) -> Unit,
+    onDeleteHabit: (Habit) -> Unit,
     onHabitDone: (Habit) -> Unit,
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .pointerInput(currentIndex) {
-                detectHorizontalDragGestures { _, dragAmount ->
-                    when {
-                        dragAmount < -30 && currentIndex < habits.lastIndex -> {
-                            onIndexChange(currentIndex + 1)
-                        }
-
-                        dragAmount > 30 && currentIndex > 0 -> {
-                            onIndexChange(currentIndex - 1)
-                        }
-                    }
-                }
-            }
     ) {
-        val habit = habits.getOrNull(currentIndex) ?: return
-
-        val titleSection = @Composable {
+        if (habits.isEmpty()) {
+            // user has no habits
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 48.dp)
+                    .align(Alignment.Center)
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = habit.title ?: "",
-                    style = MaterialTheme.typography.headlineMedium
-                )
 
-                Spacer(Modifier.height(12.dp))
-
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Active on:\n${habit.daysOfWeek?.joinToString { it.name } ?: ""}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
+                    text = "Let's add your first habit!",
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
-        }
+        } else {
+            // user has habits
+            val habit = habits.getOrNull(currentIndex) ?: return
 
-        val actionSection = @Composable {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 48.dp)
-            ) {
-                if (habit.daysOfWeek?.contains(today) == true) {
-                    Button(onClick = { habit.id?.let { onHabitDone(habit) } }) {
-                        Text("Done")
-                    }
+            val titleSection = @Composable {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 48.dp)
+                ) {
+                    Text(
+                        text = habit.title ?: "",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = "Active on:\n${habit.daysOfWeek?.joinToString { it.name } ?: ""}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
                 }
+            }
 
-                Spacer(Modifier.height(24.dp))
+            val actionSection = @Composable {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 48.dp)
+                ) {
+                    if (habit.daysOfWeek?.contains(today) == true) {
+                        Button(onClick = { habit.id?.let { onHabitDone(habit) } }) {
+                            Text("Done")
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+//
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Button(onClick = { onEditHabitClick(habit) }) {
+                            Text("Edit")
+                        }
+                        Button(onClick = { onDeleteHabit(habit) }) {
+                            Text("Delete")
+                        }
+                    }
 
-                Row(horizontalArrangement = Arrangement.Center) {
-                    habits.forEachIndexed { index, _ ->
-                        val selected = index == currentIndex
-                        Box(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .size(if (selected) 12.dp else 8.dp)
-                                .clip(CircleShape)
-                                .background(if (selected) Color.Black else Color.Gray)
-                        )
+                    Spacer(Modifier.height(24.dp))
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        habits.forEachIndexed { index, _ ->
+                            val selected = index == currentIndex
+                            Box(
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .size(if (selected) 12.dp else 8.dp)
+                                    .clip(CircleShape)
+                                    .background(if (selected) Color.Black else Color.Gray)
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        titleSection()
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-        ) {
-            DonutProgress(progress = habit.totalCount ?: 0)
-        }
-
-        actionSection()
-
-        // Arrows
-        if (currentIndex > 0) {
-            IconButton(
-                onClick = { onIndexChange(currentIndex - 1) },
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
+            titleSection()
+            Box(modifier = Modifier.align(Alignment.Center)) {
+                DonutProgress(progress = habit.totalCount ?: 0)
             }
-        }
+            actionSection()
 
-        if (currentIndex < habits.lastIndex) {
-            IconButton(
-                onClick = { onIndexChange(currentIndex + 1) },
-                modifier = Modifier.align(Alignment.CenterEnd)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+            if (currentIndex > 0) {
+                IconButton(
+                    onClick = { onIndexChange(currentIndex - 1) },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
+                }
+            }
+
+            if (currentIndex < habits.lastIndex) {
+                IconButton(
+                    onClick = { onIndexChange(currentIndex + 1) },
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                }
             }
         }
 
@@ -207,10 +225,11 @@ fun HabitsContent(
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Create Post")
+            Icon(Icons.Default.Add, contentDescription = "Create Habit")
         }
     }
 }
+
 
 @Composable
 fun DonutProgress(progress: Int) {

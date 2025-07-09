@@ -114,7 +114,13 @@ class HabitsViewModel(
         }
     }
 
-    fun resetSaveState() {
+    fun onDeleteHabit(habit: Habit, onSuccess: () -> Unit = {}) {
+        // TODO
+
+        onSuccess()
+    }
+
+        fun resetSaveState() {
         _saveState.value = SaveState.Idle
     }
 }
