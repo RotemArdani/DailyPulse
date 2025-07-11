@@ -21,7 +21,7 @@ The app encourages users to build healthy routines, share progress with friends,
 This is a **Kotlin Multiplatform (KMP)** project. The main module layout is:
 
 - `commonMain` holds all platform-agnostic code.
-- `androidMain` / `iosMain` allow using platform-specific APIs when necessary (e.g., CoreCrypto for iOS).
+- `androidMain` / `iosMain` allow using platform-specific APIs when necessary.
 - `composeApp` is our main module, where we develop our shared UI using **Jetpack Compose Multiplatform**.
 
 ---
@@ -42,7 +42,7 @@ This is a **Kotlin Multiplatform (KMP)** project. The main module layout is:
 ## Getting Started
 
 1. Clone the repository:
-   git clone https://github.com/your-org/DailyPulse.git
+   git clone https://github.com/RotemArdani/DailyPulse.git
 2. Open the project in Android Studio Hedgehog or later.
 
 3. Run the Android app: Select a device/emulator and click Run.
