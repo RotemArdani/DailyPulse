@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -43,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,9 +59,6 @@ fun Habits(
     onCreateHabitClick: () -> Unit,
     onEditHabitClick: (Habit) -> Unit,
     onNavigateBack: () -> Unit
-/*
-    onDeleteHabitClick: (Habit) -> Unit
-*/
 ) {
     var currentIndex by remember { mutableStateOf(0) }
     val uiState = viewModel.uiState.collectAsState().value
@@ -126,9 +119,11 @@ fun HabitsContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Let's add your first habit!",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                    text = "Don't have habits yet?",
+                    style = MaterialTheme.typography.titleLarge                )
+                Text(
+                    text = "Let's add your first one!",
+                    style = MaterialTheme.typography.titleLarge                )
             }
         } else {
             // user has habits
@@ -139,13 +134,13 @@ fun HabitsContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 48.dp)
+                        .padding(top = 60.dp)
                 ) {
                     Text(
                         text = habit.title ?: "",
                         style = MaterialTheme.typography.headlineMedium
                     )
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(14.dp))
                     Text(
                         text = "Active on:\n${habit.daysOfWeek?.joinToString { it.name } ?: ""}",
                         style = MaterialTheme.typography.bodyMedium,
@@ -168,7 +163,7 @@ fun HabitsContent(
                         }
                     }
                     Spacer(Modifier.height(12.dp))
-//
+
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Button(onClick = { onEditHabitClick(habit) }) {
                             Text("Edit")

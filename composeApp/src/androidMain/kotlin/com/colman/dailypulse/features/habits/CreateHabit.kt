@@ -5,6 +5,220 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.colman.dailypulse.models.habits.Habit
+import com.colman.dailypulse.utils.LocalSnackbarController
+import kotlinx.coroutines.launch
+import kotlinx.datetime.DayOfWeek
+import org.koin.androidx.compose.koinViewModel
+import java.time.format.TextStyle
+import java.util.*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun CreateHabitScreen(
+    viewModel: HabitsViewModel = koinViewModel(),
+    onSuccess: () -> Unit,
+    onNavigateBack: () -> Unit
+) {
+    var title by remember { mutableStateOf("") }
+    var selectedDays by remember { mutableStateOf(emptySet<DayOfWeek>()) }
+    var frequencyInput by remember { mutableStateOf("1") }
+    var frequencyError by remember { mutableStateOf<String?>(null) }
+    val saveState by viewModel.saveState.collectAsState()
+    val snackbarController = LocalSnackbarController.current;
+    var hasAttemptedSave by remember { mutableStateOf(false) }
+
+    LaunchedEffect(saveState) {
+        when (val currentSaveState = saveState) {
+            is SaveState.Success -> {
+                snackbarController.showMessage("Habit created successfully!")
+                title = ""
+                selectedDays = emptySet()
+                hasAttemptedSave = false
+                frequencyError = "1"
+                onSuccess()
+            }
+            is SaveState.Error -> {
+                snackbarController.showMessage("Error: ${currentSaveState.errorMessage}")
+            }
+            else -> {}
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { if (saveState !is SaveState.Success) viewModel.resetSaveState() }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Create New Habit", style = MaterialTheme.typography.titleLarge)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        hasAttemptedSave = true
+                        val currentFrequency = frequencyInput.toIntOrNull()
+
+                        if (currentFrequency == null || currentFrequency <= 0) {
+                            frequencyError = "Frequency must be a positive number."
+                            snackbarController.showMessage("Please correct the errors.")
+                            return@IconButton
+                        } else {
+                            frequencyError = null
+                        }
+
+                        if (title.isNotBlank() && selectedDays.isNotEmpty() && frequencyError == null) {
+                            viewModel.onCreateHabit(
+                                Habit(
+                                    id = null,
+                                    title = title.trim(),
+                                    daysOfWeek = selectedDays,
+                                    frequency = currentFrequency,
+                                    dailyCount = 0,
+                                    totalCount = 0,
+                                )
+                            )
+                        } else {
+                            snackbarController.showMessage("Title and at least one day are required.")
+                        }
+                    }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Save Habit")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(24.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Habit Title*", style = MaterialTheme.typography.labelLarge)
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        placeholder = { Text("Enter a name...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = title.isBlank() && hasAttemptedSave,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            imeAction = ImeAction.Next
+                        )
+                    )
+                    if (title.isBlank() && hasAttemptedSave) {
+                        Text("Title cannot be empty.", color = MaterialTheme.colorScheme.error)
+                    }
+                }
+            }
+
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Repeat on Days*", style = MaterialTheme.typography.labelLarge)
+                    Spacer(Modifier.height(12.dp))
+                    DayOfWeekSelector(
+                        selectedDays = selectedDays,
+                        onDaySelected = { day, isSelected ->
+                            selectedDays = if (isSelected) selectedDays + day else selectedDays - day
+                        }
+                    )
+                    if (selectedDays.isEmpty() && hasAttemptedSave) {
+                        Text("Please select at least one day.", color = MaterialTheme.colorScheme.error)
+                    }
+                }
+            }
+
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Frequency*", style = MaterialTheme.typography.labelLarge)
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = frequencyInput,
+                        onValueChange = {
+                            if (it.all { ch -> ch.isDigit() }) frequencyInput = it
+                        },
+                        placeholder = { Text("Times per day, e.g. 1") },
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = frequencyError != null,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        )
+                    )
+                    if (frequencyError != null) {
+                        Text(frequencyError!!, color = MaterialTheme.colorScheme.error)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/*
+package com.colman.dailypulse.features.habits
+
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,7 +302,9 @@ fun CreateHabitScreen(
             is SaveState.Error -> {
                 snackbarController.showMessage("Error: ${currentSaveState.errorMessage}")
             }
-            else -> { /* Idle or Saving */ }
+            else -> {
+*//* Idle or Saving *//*
+ }
         }
     }
 
@@ -253,7 +469,7 @@ fun CreateHabitScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
-}
+}*/
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

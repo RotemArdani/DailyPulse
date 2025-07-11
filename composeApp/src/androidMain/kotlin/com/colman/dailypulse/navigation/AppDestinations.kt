@@ -9,5 +9,4 @@ object AppDestinations {
     const val EDIT_HABIT_ROUTE = "editHabit"
     const val POSTS_ROUTE = "posts"
     const val HABITS_ROUTE = "habits"
-    // Add other routes as needed
 }

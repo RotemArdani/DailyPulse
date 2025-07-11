@@ -25,6 +25,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.androidx.work.runtime.ktx)
+            implementation("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -36,6 +38,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(projects.shared)
+            implementation("androidx.compose.animation:animation:1.5.4") // 👈 הוסיפי את זה כאן
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -89,5 +93,6 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.coil.compose)
     implementation(libs.firebase.auth.ktx)
+
 }
 

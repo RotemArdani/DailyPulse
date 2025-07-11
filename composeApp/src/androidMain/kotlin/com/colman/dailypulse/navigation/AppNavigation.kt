@@ -41,7 +41,6 @@ import com.colman.dailypulse.features.habits.EditHabitScreen
 import com.colman.dailypulse.features.habits.Habits
 import com.colman.dailypulse.features.posts.CreatePostScreen
 import com.colman.dailypulse.features.posts.PostsScreen
-import com.colman.dailypulse.ui.components.AppHeader
 import com.colman.dailypulse.ui.components.InsideAppHeader
 import com.colman.dailypulse.utils.LocalSnackbarController
 import com.colman.dailypulse.utils.SnackbarController
