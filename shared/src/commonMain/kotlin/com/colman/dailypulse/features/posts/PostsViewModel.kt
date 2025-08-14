@@ -93,6 +93,22 @@ class PostsViewModel(
         }
     }
 
+    fun onDeletePost(postId: String) {
+        scope.launch {
+            _saveState.value = SaveState.Saving
+
+            when (val result = useCases.deletePost(postId)) {
+                is Result.Success -> {
+                    fetchPosts()
+                    _saveState.value = SaveState.Success
+                }
+                is Result.Failure -> {
+                    _saveState.value = SaveState.Error(result.error?.message ?: "Unknown error")
+                }
+            }
+        }
+    }
+
     fun toggleLike(postId: String, userId: String) {
         scope.launch {
             try {

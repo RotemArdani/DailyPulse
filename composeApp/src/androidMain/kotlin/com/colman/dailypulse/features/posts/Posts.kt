@@ -27,7 +27,6 @@ import com.colman.dailypulse.models.posts.Posts
 import com.colman.dailypulse.utils.LocalSnackbarController
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.material3.Scaffold
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -52,6 +51,7 @@ fun PostsScreen(
             userId,
             onCreatePostClick,
             onLikePostClick = { post -> viewModel.toggleLike(post.id?: "", userId?: "") },
+            onDeletePostClick = { postId -> viewModel.onDeletePost(postId) }
         )
 
         PostsState.Loading -> LoadingContent()
@@ -64,10 +64,9 @@ fun PostsContent(
     userId: String? = "",
     onCreatePostClick: () -> Unit,
     onLikePostClick: (Post) -> Unit,
-    modifier: Modifier = Modifier
-
+    onDeletePostClick: (String) -> Unit,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
@@ -77,7 +76,9 @@ fun PostsContent(
                 PostCard(
                     post = post,
                     isLiked = post.likedByUserIds.contains(userId),
-                    onLikeClick = { onLikePostClick(post) }
+                    currentUserId = userId?: "",
+                    onLikeClick = {onLikePostClick(post)},
+                    onDeleteClick = { onDeletePostClick(post.id?: "")}
                 )
             }
         }

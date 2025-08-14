@@ -5,7 +5,7 @@ import com.colman.dailypulse.models.habits.Habit
 public sealed class HabitState {
     data object Loading: HabitState()
     data class Loaded(
-        val habit: Habit
+        val habit: Habit?
     ): HabitState()
     data class Error(
         var errorMessage: String

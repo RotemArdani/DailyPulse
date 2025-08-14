@@ -55,24 +55,6 @@ class HabitsViewModel(
     }
 
 
-    fun onCreateHabit(habit: Habit) {
-        scope.launch {
-            _saveState.value = SaveState.Saving // Indicate saving is in progress
-
-            // Call the repository's saveHabit function
-            when (val result = useCases.createHabit(habit)) {
-                is Result.Success -> {
-                    _saveState.value = SaveState.Success
-                    // Optionally, reload habits or update the UI to reflect the change
-                    fetchHabits() // Or more sophisticated UI update
-                }
-                is Result.Failure -> {
-                    _saveState.value = SaveState.Error(result.error?.message ?: "Failed to create habits")
-                }
-            }
-        }
-    }
-
     fun onHabitDone(habitId: String) {
         scope.launch {
         try {
@@ -98,29 +80,24 @@ class HabitsViewModel(
         }
     }
 
-    fun onUpdateHabit(habit: Habit) {
+    fun onDeleteHabit(habitId: String) {
         scope.launch {
-            _saveState.value = SaveState.Saving // Indicate saving is in progress
+            try {
+            _saveState.value = SaveState.Saving
 
-            when (val result = useCases.updateHabit(habit)) {
+            when (val result = useCases.onDeleteHabit(habitId)) {
                 is Result.Success -> {
                     _saveState.value = SaveState.Success
-                    fetchHabits() // Or more sophisticated UI update
+                    fetchHabits()
                 }
                 is Result.Failure -> {
-                    _saveState.value = SaveState.Error(result.error?.message ?: "Failed to create habits")
+                    _saveState.value = SaveState.Error(result.error?.message ?: "Failed to update habit")
                 }
             }
+
+            } catch (e: Exception) {
+                _snackbarMessage.emit("Failed to delete habit.")
+            }
         }
-    }
-
-    fun onDeleteHabit(habit: Habit, onSuccess: () -> Unit = {}) {
-        // TODO
-
-        onSuccess()
-    }
-
-        fun resetSaveState() {
-        _saveState.value = SaveState.Idle
     }
 }

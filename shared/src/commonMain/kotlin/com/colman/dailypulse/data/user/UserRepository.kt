@@ -7,5 +7,5 @@ import com.colman.dailypulse.models.users.User
 interface UserRepository {
     suspend fun signIn(email: String, password: String): Result<User, Error>
     suspend fun signUp(email: String, password: String, name: String): Result<String, Error>
-    suspend fun logout()
+    suspend fun logout(): Result<String, Error>
 }

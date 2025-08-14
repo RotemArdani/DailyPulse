@@ -14,7 +14,9 @@ actual val platformModule: Module = module {
     single<HttpClientEngine> { Darwin.create()}
 
     factoryOf(::HabitsViewModel)
-    factoryOf(::HabitViewModel)
+    factory { (habitId: String?) ->
+        HabitViewModel(get(), habitId)
+    }
     factoryOf(::PostsViewModel)
     factoryOf(::UserViewModel)
 }

@@ -9,12 +9,16 @@ import com.colman.dailypulse.data.posts.RemotePostsRepository
 import com.colman.dailypulse.data.user.RemoteUserRepository
 import com.colman.dailypulse.data.user.UserRepository
 import com.colman.dailypulse.domian.habits.CreateHabit
+import com.colman.dailypulse.domian.habits.DeleteHabit
+import com.colman.dailypulse.domian.habits.GetHabitDetails
 import com.colman.dailypulse.domian.habits.GetHabits
 import com.colman.dailypulse.domian.habits.OnHabitDone
 import com.colman.dailypulse.domian.habits.UpdateHabit
 import com.colman.dailypulse.domian.posts.CreatePost
+import com.colman.dailypulse.domian.posts.DeletePost
 import com.colman.dailypulse.domian.posts.GetPosts
 import com.colman.dailypulse.domian.posts.LikePost
+import com.colman.dailypulse.domian.user.OnLogout
 import com.colman.dailypulse.domian.user.OnSignIn
 import com.colman.dailypulse.domian.user.OnSignUp
 import com.colman.dailypulse.features.habits.HabitsUseCases
@@ -49,6 +53,8 @@ val habitsDomainModule = module {
     factoryOf(::CreateHabit)
     factoryOf(::UpdateHabit)
     factoryOf(::OnHabitDone)
+    factoryOf(::DeleteHabit)
+    factoryOf(::GetHabitDetails)
     factoryOf(::HabitsUseCases)
 }
 
@@ -56,14 +62,17 @@ val postsDomainModule = module {
     factoryOf(::GetPosts)
     factoryOf(::CreatePost)
     factoryOf(::LikePost)
+    factoryOf(::DeletePost)
     factoryOf(::PostsUseCases)
 }
 
 val userDomainModule = module {
     factoryOf(::OnSignIn)
     factoryOf(::OnSignUp)
+    factoryOf(::OnLogout)
     factoryOf(::UserUseCases)
 }
+
 
 val commonModule = module {
     singleOf(::createJson)
@@ -76,8 +85,6 @@ val commonModule = module {
         clientEngine = get(),
         json = get()
     ) }
-
-
 }
 
 fun createJson(): Json = Json {

@@ -59,8 +59,11 @@ class RemoteFirebaseRepository: FirebaseRepository {
         postRef.set((post.copy(likedByUserIds = updatedLikes)))
     }
 
-    override suspend fun signUpUser(email: String, password: String, name: String) {
+    override suspend fun deletePost(postId: String) {
+        firestore.collection("posts").document(postId).delete()
+    }
 
+    override suspend fun signUpUser(email: String, password: String, name: String) {
             val authResult = auth.createUserWithEmailAndPassword(email, password)
             val user = authResult.user ?: return
 
@@ -113,13 +116,25 @@ class RemoteFirebaseRepository: FirebaseRepository {
         habitRef.set((habit.copy(totalCount = habit.totalCount?.plus(1), lastModified = Clock.System.now())))
     }
 
+    override suspend fun getHabitDetails(habitId: String): Habit? {
+        val userId = auth.currentUser?.uid ?: return null
 
-    override suspend fun deleteHabit(habit: Habit) {
+        val querySnapshot = firestore.collection("users")
+            .document(userId)
+            .collection("habits").document(habitId).get()
+
+        val data = querySnapshot.data<Habit>()
+
+        return data;
+    }
+
+
+    override suspend fun deleteHabit(habitId: String) {
         val userId = auth.currentUser?.uid ?: return
         firestore.collection("users")
             .document(userId)
             .collection("habits")
-            .document(habit.id.toString())
+            .document(habitId)
             .delete()
     }
 
@@ -151,7 +166,9 @@ class RemoteFirebaseRepository: FirebaseRepository {
             post.copy(authorName = userName)
         }
 
-        return Posts(items = postsWithAuthorName)
+        val sortedPosts = postsWithAuthorName.sortedByDescending { it.createdAt }
+
+        return Posts(items = sortedPosts)
     }
 
     override suspend fun signInAnonymously() {
@@ -160,7 +177,7 @@ class RemoteFirebaseRepository: FirebaseRepository {
         }
     }
 
-    override suspend fun getHabitDetails(habitId: String): Habit? {
-        TODO("Not yet implemented")
+    override suspend fun logout() {
+        Firebase.auth.signOut()
     }
 }

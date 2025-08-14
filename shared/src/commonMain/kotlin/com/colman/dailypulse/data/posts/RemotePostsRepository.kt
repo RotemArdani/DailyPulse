@@ -31,7 +31,7 @@ class RemotePostsRepository(
             Result.Success("")
         } catch (e: Exception) {
             Result.Failure(
-                HabitsError(message = e.message ?: "")
+                PostsError(message = e.message ?: "")
             )
         }
     }
@@ -42,7 +42,18 @@ class RemotePostsRepository(
             Result.Success("")
         } catch (e: Exception) {
             Result.Failure(
-                HabitsError(message = e.message ?: "")
+                PostsError(message = e.message ?: "")
+            )
+        }
+    }
+
+    override suspend fun deletePost(postId: String): Result<String, Error> {
+        return try {
+            firebaseRepository.deletePost(postId);
+            Result.Success("")
+        } catch (e: Exception) {
+            Result.Failure(
+                PostsError(message = e.message ?: "")
             )
         }
     }

@@ -12,13 +12,6 @@ public sealed class HabitsState {
     ): HabitsState()
 }
 
-//public sealed class SaveHabitState {
-//    data object Idle : SaveHabitState()
-//    data object Saving : SaveHabitState()
-//    data object Success : SaveHabitState()
-//    data class Error(val errorMessage: String) : SaveHabitState()
-//}
-
 sealed interface SaveState {
     data object Idle : SaveState
     data object Saving : SaveState

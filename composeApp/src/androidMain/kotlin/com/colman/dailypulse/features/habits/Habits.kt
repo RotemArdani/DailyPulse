@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -59,6 +63,9 @@ fun Habits(
     onCreateHabitClick: () -> Unit,
     onEditHabitClick: (Habit) -> Unit,
     onNavigateBack: () -> Unit
+/*
+    onDeleteHabitClick: (Habit) -> Unit
+*/
 ) {
     var currentIndex by remember { mutableStateOf(0) }
     val uiState = viewModel.uiState.collectAsState().value
@@ -82,10 +89,7 @@ fun Habits(
                 today,
                 onCreateHabitClick,
                 onEditHabitClick = onEditHabitClick,
-                onDeleteHabit = { habit -> viewModel.onDeleteHabit(habit) {
-                        onNavigateBack()
-                    }
-                },
+                onDeleteHabit = { habit -> viewModel.onDeleteHabit(habit.id?: "")},
                 onHabitDone = {habit -> viewModel.onHabitDone(habit.id?: "")}
             )
             HabitsState.Loading -> LoadingContent()
@@ -123,10 +127,10 @@ fun HabitsContent(
                     style = MaterialTheme.typography.titleLarge                )
                 Text(
                     text = "Let's add your first one!",
-                    style = MaterialTheme.typography.titleLarge                )
+                    style = MaterialTheme.typography.titleLarge
+                )
             }
         } else {
-            // user has habits
             val habit = habits.getOrNull(currentIndex) ?: return
 
             val titleSection = @Composable {

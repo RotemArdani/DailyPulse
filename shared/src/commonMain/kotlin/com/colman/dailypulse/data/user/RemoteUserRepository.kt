@@ -37,8 +37,15 @@ class RemoteUserRepository(
         }
     }
 
-    override suspend fun logout() {
-        TODO("Not yet implemented")
+    override suspend fun logout(): Result<String, Error> {
+        return try {
+            firebaseRepository.logout();
+            Result.Success("")
+        } catch (e: Exception) {
+            Result.Failure(
+                PostsError(message = e.message ?: "")
+            )
+        }
     }
 
 }

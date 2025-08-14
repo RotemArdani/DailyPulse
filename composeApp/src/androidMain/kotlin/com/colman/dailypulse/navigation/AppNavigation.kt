@@ -72,7 +72,7 @@ fun AppNavigation() {
 
     Scaffold(
         topBar = {
-            if (!invisibleBottomBar) { // invisible to sign in, sign up
+            if (!invisibleBottomBar) {
                 TopAppBar(
                     title = {
                         Box(
@@ -97,7 +97,7 @@ fun AppNavigation() {
                 )
             }
         },
-        bottomBar = { // invisible to sign in, sign up
+        bottomBar = {
             if (!invisibleBottomBar) {
                 NavigationBar {
                     NavigationBarItem(
@@ -170,7 +170,7 @@ fun AppNavigation() {
             composable(AppDestinations.SIGN_UP_ROUTE) {
                 SignUpScreen(
                     onSignUpSuccess = {
-                        navController.navigate(AppDestinations.SIGN_IN_ROUTE) {
+                        navController.navigate(AppDestinations.POSTS_ROUTE) {
                             popUpTo(AppDestinations.SIGN_UP_ROUTE) { inclusive = true }
                         }
                     },
@@ -224,7 +224,6 @@ fun AppNavigation() {
                             popUpTo(AppDestinations.HABITS_ROUTE) { inclusive = true }
                         }
                     }
-
                 )
             }
 
@@ -232,7 +231,7 @@ fun AppNavigation() {
                 val habitId = backStackEntry.arguments?.getString("habitId")
 
                 EditHabitScreen(
-                    habitId = habitId,
+                    habitId = habitId?: "",
                     onNavigateBack = { navController.popBackStack() },
                     onSuccess = {
                         navController.navigate(AppDestinations.HABITS_ROUTE) {

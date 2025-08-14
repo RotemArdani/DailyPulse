@@ -36,6 +36,17 @@ class RemoteHabitsRepository(
         }
     }
 
+    override suspend fun deleteHabit(habitId: String): Result<String, Error> {
+        return try {
+            firebaseRepository.deleteHabit(habitId)
+            Result.Success("")
+        } catch (e: Exception) {
+            Result.Failure(
+                HabitsError(message = e.message ?: "")
+            )
+        }
+    }
+
     override suspend fun updateHabit(habit: Habit): Result<String, Error> {
         return try {
             firebaseRepository.updateHabit(habit);
@@ -51,6 +62,17 @@ class RemoteHabitsRepository(
         return try {
             firebaseRepository.habitDone(habitId);
             Result.Success("")
+        } catch (e: Exception) {
+            Result.Failure(
+                HabitsError(message = e.message ?: "")
+            )
+        }
+    }
+
+    override suspend fun getHabitDetails(habitId: String): Result<Habit, Error> {
+        return try {
+            val habit = firebaseRepository.getHabitDetails(habitId);
+            Result.Success(habit)
         } catch (e: Exception) {
             Result.Failure(
                 HabitsError(message = e.message ?: "")

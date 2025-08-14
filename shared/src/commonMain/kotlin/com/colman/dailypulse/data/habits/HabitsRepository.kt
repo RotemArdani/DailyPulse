@@ -8,6 +8,8 @@ import com.colman.dailypulse.models.habits.Habits
 interface HabitsRepository {
     suspend fun getHabits(): Result<Habits, Error>
     suspend fun createHabit(habit: Habit): Result<String, Error>
+    suspend fun deleteHabit(habitId: String): Result<String, Error>
     suspend fun updateHabit(habit: Habit): Result<String, Error>
     suspend fun habitDone(habitId: String): Result<String, Error>
+    suspend fun getHabitDetails(habitId: String): Result<Habit, Error>
 }
