@@ -33,13 +33,12 @@ object DayOfWeekSetSerializer : KSerializer<Set<DayOfWeek>> {
 
 @Serializable
 data class Habit(
-    val id: String? = "", // Unique ID
-    val title: String?, // Short name of the habit
+    val id: String? = "",
+    val title: String?,
     @Serializable(with = DayOfWeekSetSerializer::class)
-    val daysOfWeek: Set<DayOfWeek>?, // Days when habit should be done
-    val frequency: Int? = 1, // How often habit should be done
-    val dailyCount: Int? = 0, // How many times habit should be done in a day
-    val totalCount: Int? = 0, // Total number of times habit should be done
-    val createdAt: Instant = Clock.System.now(), // When habit was created
+    val daysOfWeek: Set<DayOfWeek>?,
+    val goal: Int? = 1,
+    val totalCount: Int? = 0,
+    val createdAt: Instant = Clock.System.now(),
     val lastModified: Instant = Clock.System.now()
 )

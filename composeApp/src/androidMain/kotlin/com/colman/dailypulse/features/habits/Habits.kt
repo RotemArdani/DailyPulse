@@ -113,7 +113,6 @@ fun HabitsContent(
             .padding(horizontal = 16.dp)
     ) {
         if (habits.isEmpty()) {
-            // user has no habits
             Column(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -195,7 +194,7 @@ fun HabitsContent(
 
             titleSection()
             Box(modifier = Modifier.align(Alignment.Center)) {
-                DonutProgress(progress = habit.totalCount ?: 0)
+                DonutProgress(progress = habit.totalCount ?: 0, habit.goal ?: 60)
             }
             actionSection()
 
@@ -231,9 +230,9 @@ fun HabitsContent(
 
 
 @Composable
-fun DonutProgress(progress: Int) {
+fun DonutProgress(progress: Int, goal: Int = 60) {
     val animatedProgress by animateFloatAsState(
-        targetValue = progress.coerceAtMost(60) / 60f,
+        targetValue = progress.coerceAtMost(goal) / 60f,
         animationSpec = tween(durationMillis = 600),
         label = "DonutProgress"
     )

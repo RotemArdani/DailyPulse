@@ -77,8 +77,8 @@ fun CreateHabitScreen(
 
     var title by remember { mutableStateOf("") }
     var selectedDays by remember { mutableStateOf(emptySet<DayOfWeek>()) }
-    var frequencyInput by remember { mutableStateOf("1") }
-    var frequencyError by remember { mutableStateOf<String?>(null) }
+    var goalInput by remember { mutableStateOf("60") }
+    var goalError by remember { mutableStateOf<String?>(null) }
     var hasAttemptedSave by remember { mutableStateOf(false) }
 
     LaunchedEffect(saveState) {
@@ -87,8 +87,8 @@ fun CreateHabitScreen(
                 snackbarController.showMessage("Habit created successfully!")
                 title = ""
                 selectedDays = emptySet()
-                frequencyInput = "1"
-                frequencyError = null
+                goalInput = "60"
+                goalError = null
                 hasAttemptedSave = false
                 onSuccess()
             }
@@ -188,24 +188,24 @@ fun CreateHabitScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("Frequency*", style = MaterialTheme.typography.labelLarge)
+                    Text("Goal*", style = MaterialTheme.typography.labelLarge)
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
-                        value = frequencyInput,
+                        value = goalInput,
                         onValueChange = {
-                            if (it.all { ch -> ch.isDigit() }) frequencyInput = it
+                            if (it.all { ch -> ch.isDigit() }) goalInput = it
                         },
-                        placeholder = { Text("Times per day, e.g. 1") },
+                        placeholder = { Text("") },
                         modifier = Modifier.fillMaxWidth(),
-                        isError = frequencyError != null,
+                        isError = goalError != null,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done
                         )
                     )
-                    if (frequencyError != null) {
-                        Text(frequencyError!!, color = MaterialTheme.colorScheme.error)
+                    if (goalError != null) {
+                        Text(goalError!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             }

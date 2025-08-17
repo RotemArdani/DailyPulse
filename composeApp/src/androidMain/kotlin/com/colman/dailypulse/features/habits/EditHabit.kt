@@ -56,9 +56,6 @@ import com.colman.dailypulse.utils.LocalSnackbarController
 import kotlinx.datetime.DayOfWeek
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import java.time.format.TextStyle
-import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -75,8 +72,8 @@ fun EditHabitScreen(
 
     var title by remember { mutableStateOf("") }
     var selectedDays by remember { mutableStateOf(emptySet<DayOfWeek>()) }
-    var frequencyInput by remember { mutableStateOf("1") }
-    var frequencyError by remember { mutableStateOf<String?>(null) }
+    var goalInput by remember { mutableStateOf("60") }
+    var goalError by remember { mutableStateOf<String?>(null) }
     var hasAttemptedSave by remember { mutableStateOf(false) }
 
     LaunchedEffect(habitState) {
@@ -84,7 +81,7 @@ fun EditHabitScreen(
             val habit = (habitState as HabitState.Loaded).habit
             title = habit?.title ?: ""
             selectedDays = habit?.daysOfWeek?.toSet() ?: emptySet()
-            frequencyInput = habit?.frequency.toString()
+            goalInput = habit?.goal.toString()
         }
     }
 
@@ -146,10 +143,10 @@ fun EditHabitScreen(
                             IconButton(
                                 onClick = {
                                     hasAttemptedSave = true
-                                    val frequency = frequencyInput.toIntOrNull()
+                                    val goal = goalInput.toIntOrNull()
 
-                                    if (frequency == null || frequency <= 0) {
-                                        frequencyError = "Must be a positive number"
+                                    if (goal == null || goal <= 0) {
+                                        goalError = "Must be a positive number"
                                         return@IconButton
                                     }
 
@@ -158,7 +155,7 @@ fun EditHabitScreen(
                                             viewModel.updateHabit(
                                                 habit.copy(
                                                     title = title.trim(),
-                                                    frequency = frequency,
+                                                    goal = goal,
                                                     daysOfWeek = selectedDays
                                                 )
                                             )
@@ -192,7 +189,7 @@ fun EditHabitScreen(
                             OutlinedTextField(
                                 value = title,
                                 onValueChange = { title = it },
-                                label = { Text("Habit Title*") },
+                                label = { Text("Habit Title") },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(
@@ -248,30 +245,30 @@ fun EditHabitScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                "Frequency (times per day/period)*",
+                                "Goal (How many times until it becomes a habit )",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
 
                             OutlinedTextField(
-                                value = frequencyInput,
+                                value = goalInput,
                                 onValueChange = { input ->
                                     if (input.all { it.isDigit() }) {
-                                        frequencyInput = input
-                                        frequencyError = null
+                                        goalInput = input
+                                        goalError = null
                                     }
                                 },
-                                label = { Text("Times per period (e.g., 1)") },
+                                label = { Text("") },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done
                                 ),
-                                isError = frequencyError != null
+                                isError = goalError != null
                             )
 
-                            frequencyError?.let {
+                            goalError?.let {
                                 Text(
                                     text = it,
                                     color = MaterialTheme.colorScheme.error,
