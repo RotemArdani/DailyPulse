@@ -123,6 +123,36 @@ fun CreateHabitScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        hasAttemptedSave = true
+                        val currentGoal = goalInput.toIntOrNull()
+
+                        if (currentGoal == null || currentGoal <= 0) {
+                            goalError = "Goal must be a positive number."
+                            snackbarController.showMessage("Please correct the errors.")
+                            return@IconButton
+                        } else {
+                            goalError = null
+                        }
+
+                        if (title.isNotBlank() && selectedDays.isNotEmpty() && goalError == null) {
+                            viewModel.createHabit(
+                                Habit(
+                                    id = null,
+                                    title = title.trim(),
+                                    daysOfWeek = selectedDays,
+                                    goal = currentGoal,
+                                    totalCount = 0,
+                                )
+                            )
+                        } else {
+                            snackbarController.showMessage("Title and at least one day are required.")
+                        }
+                    }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Save Habit")
+                    }
                 }
             )
         }

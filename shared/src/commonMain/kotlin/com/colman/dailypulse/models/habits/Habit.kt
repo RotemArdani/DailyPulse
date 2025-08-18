@@ -37,7 +37,7 @@ data class Habit(
     val title: String?,
     @Serializable(with = DayOfWeekSetSerializer::class)
     val daysOfWeek: Set<DayOfWeek>?,
-    val goal: Int? = 1,
+    val goal: Int? = 60,
     val totalCount: Int? = 0,
     val createdAt: Instant = Clock.System.now(),
     val lastModified: Instant = Clock.System.now()

@@ -207,10 +207,8 @@ fun AppNavigation() {
                     onEditHabitClick = { habit ->
                         navController.navigate("${AppDestinations.EDIT_HABIT_ROUTE}/${habit.id}")
                     },
-                    onNavigateBack = {
-                        navController.navigate(AppDestinations.HABITS_ROUTE) {
-                            popUpTo(AppDestinations.HABITS_ROUTE) { inclusive = true }
-                        }
+                    onShareHabitSuccess = {
+                        navController.navigate(AppDestinations.POSTS_ROUTE)
                     }
                 )
             }

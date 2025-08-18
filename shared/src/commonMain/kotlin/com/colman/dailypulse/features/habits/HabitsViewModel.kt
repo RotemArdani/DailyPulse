@@ -7,6 +7,7 @@ import com.colman.dailypulse.features.BaseViewModel
 import com.colman.dailypulse.features.posts.PostsState
 import com.colman.dailypulse.models.habits.Habit
 import com.colman.dailypulse.models.habits.Habits
+import com.colman.dailypulse.models.posts.Post
 import com.colman.dailypulse.models.posts.Posts
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -97,6 +98,23 @@ class HabitsViewModel(
 
             } catch (e: Exception) {
                 _snackbarMessage.emit("Failed to delete habit.")
+            }
+        }
+    }
+
+    fun onShareHabit(habit: Habit, onSuccess: () -> Unit) {
+        scope.launch {
+            _saveState.value = SaveState.Saving
+            val description = "I have just completed my habit of ${habit.title}"
+
+            when (val result = useCases.createPost(Post(description = description))) {
+                is Result.Success -> {
+                    _saveState.value = SaveState.Success
+                    onSuccess()
+                }
+                is Result.Failure -> {
+                    _saveState.value = SaveState.Error(result.error?.message ?: "Unknown error")
+                }
             }
         }
     }

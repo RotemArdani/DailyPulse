@@ -18,18 +18,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +51,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.colman.dailypulse.models.habits.Habit
 import com.colman.dailypulse.utils.LocalSnackbarController
 import kotlinx.datetime.Clock
@@ -62,10 +66,7 @@ fun Habits(
     viewModel: HabitsViewModel = koinViewModel(),
     onCreateHabitClick: () -> Unit,
     onEditHabitClick: (Habit) -> Unit,
-    onNavigateBack: () -> Unit
-/*
-    onDeleteHabitClick: (Habit) -> Unit
-*/
+    onShareHabitSuccess: () -> Unit,
 ) {
     var currentIndex by remember { mutableStateOf(0) }
     val uiState = viewModel.uiState.collectAsState().value
@@ -79,7 +80,6 @@ fun Habits(
     }
 
     val today = remember { Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.dayOfWeek }
-
         when(uiState) {
             is HabitsState.Error -> ErrorContent(message = uiState.errorMessage)
             is HabitsState.Loaded -> HabitsContent(
@@ -90,7 +90,8 @@ fun Habits(
                 onCreateHabitClick,
                 onEditHabitClick = onEditHabitClick,
                 onDeleteHabit = { habit -> viewModel.onDeleteHabit(habit.id?: "")},
-                onHabitDone = {habit -> viewModel.onHabitDone(habit.id?: "")}
+                onHabitDone = {habit -> viewModel.onHabitDone(habit.id?: "")},
+                onHabitShare = {habit -> viewModel.onShareHabit(habit, onShareHabitSuccess)}
             )
             HabitsState.Loading -> LoadingContent()
         }
@@ -106,7 +107,10 @@ fun HabitsContent(
     onEditHabitClick: (Habit) -> Unit,
     onDeleteHabit: (Habit) -> Unit,
     onHabitDone: (Habit) -> Unit,
+    onHabitShare: (Habit) -> Unit,
 ) {
+    var showGoalReachedDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -119,15 +123,9 @@ fun HabitsContent(
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Don't have habits yet?",
-                    style = MaterialTheme.typography.titleLarge                )
-                Text(
-                    text = "Let's add your first one!",
-                    style = MaterialTheme.typography.titleLarge
-                )
+                Text("Don't have habits yet?", style = MaterialTheme.typography.titleLarge)
+                Text("Let's add your first one!", style = MaterialTheme.typography.titleLarge)
             }
         } else {
             val habit = habits.getOrNull(currentIndex) ?: return
@@ -139,10 +137,7 @@ fun HabitsContent(
                         .fillMaxWidth()
                         .padding(top = 60.dp)
                 ) {
-                    Text(
-                        text = habit.title ?: "",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                    Text(habit.title ?: "", style = MaterialTheme.typography.headlineMedium)
                     Spacer(Modifier.height(14.dp))
                     Text(
                         text = "Active on:\n${habit.daysOfWeek?.joinToString { it.name } ?: ""}",
@@ -160,8 +155,14 @@ fun HabitsContent(
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 48.dp)
                 ) {
-                    if (habit.daysOfWeek?.contains(today) == true) {
-                        Button(onClick = { habit.id?.let { onHabitDone(habit) } }) {
+                    if (habit.daysOfWeek?.contains(today) == true && habit.totalCount!! < (habit.goal ?: 60)) {
+                        Button(onClick = {
+                            val nextCount = (habit.totalCount ?: 0) + 1
+                            if (nextCount >= (habit.goal ?: 60)) {
+                                showGoalReachedDialog = true
+                            }
+                            onHabitDone(habit)
+                        }) {
                             Text("Done")
                         }
                     }
@@ -215,7 +216,58 @@ fun HabitsContent(
                     Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
                 }
             }
-        }
+
+            if (showGoalReachedDialog) {
+                Dialog(onDismissRequest = { showGoalReachedDialog = false }) {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        tonalElevation = 8.dp,
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                IconButton(onClick = { showGoalReachedDialog = false }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Close")
+                                }
+                            }
+
+                            // 🎉 emoji on its own line
+                            Text(
+                                text = "🎉",
+                                style = MaterialTheme.typography.headlineLarge,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Spacer(Modifier.height(8.dp))
+
+                            // Title below the emoji
+                            Text(
+                                text = "You have created a new habit!",
+                                style = MaterialTheme.typography.headlineSmall,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                            )
+
+                            Spacer(Modifier.height(24.dp))
+
+                            Button(onClick = {
+                                onHabitShare(habit)
+                                showGoalReachedDialog = false
+                            }) {
+                                Text("Share")
+                            }
+                        }
+                    }
+                }
+            }
+            }
 
         FloatingActionButton(
             onClick = onCreateHabitClick,
@@ -228,11 +280,10 @@ fun HabitsContent(
     }
 }
 
-
 @Composable
-fun DonutProgress(progress: Int, goal: Int = 60) {
+fun DonutProgress(progress: Int, goal: Int) {
     val animatedProgress by animateFloatAsState(
-        targetValue = progress.coerceAtMost(goal) / 60f,
+        targetValue = progress.coerceAtMost(goal) / goal.toFloat(),
         animationSpec = tween(durationMillis = 600),
         label = "DonutProgress"
     )
@@ -256,7 +307,7 @@ fun DonutProgress(progress: Int, goal: Int = 60) {
         }
 
         Text(
-            text = "${(animatedProgress * 60).toInt()} / 60",
+            text = "${progress.coerceAtMost(goal)} / $goal",
             style = MaterialTheme.typography.bodyLarge
         )
     }

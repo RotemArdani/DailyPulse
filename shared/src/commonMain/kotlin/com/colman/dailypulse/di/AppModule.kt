@@ -55,6 +55,7 @@ val habitsDomainModule = module {
     factoryOf(::OnHabitDone)
     factoryOf(::DeleteHabit)
     factoryOf(::GetHabitDetails)
+    factoryOf(::CreatePost)
     factoryOf(::HabitsUseCases)
 }
 

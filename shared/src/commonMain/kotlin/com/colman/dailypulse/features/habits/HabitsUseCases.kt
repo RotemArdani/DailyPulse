@@ -6,6 +6,7 @@ import com.colman.dailypulse.domian.habits.GetHabitDetails
 import com.colman.dailypulse.domian.habits.GetHabits
 import com.colman.dailypulse.domian.habits.OnHabitDone
 import com.colman.dailypulse.domian.habits.UpdateHabit
+import com.colman.dailypulse.domian.posts.CreatePost
 
 class HabitsUseCases(
     val getHabits: GetHabits,
@@ -13,5 +14,6 @@ class HabitsUseCases(
     val updateHabit: UpdateHabit,
     val onHabitDone: OnHabitDone,
     val onDeleteHabit: DeleteHabit,
-    val getHabitDetails: GetHabitDetails
+    val getHabitDetails: GetHabitDetails,
+    val createPost: CreatePost
 )

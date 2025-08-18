@@ -29,7 +29,7 @@ class HabitReminderWorker(
                     val lastDoneDate = habit.lastModified
                         .toLocalDateTime(TimeZone.currentSystemDefault())
                         .date
-                    lastDoneDate != today
+                    lastDoneDate != today && habit.totalCount!! < (habit.goal?: 60)
                 }
 
 
