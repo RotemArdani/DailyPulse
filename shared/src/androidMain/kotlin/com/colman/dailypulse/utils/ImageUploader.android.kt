@@ -20,8 +20,6 @@ actual class ImageUploader {
                     }
 
                     override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {
-                        val progress = (bytes * 100) / totalBytes
-//                        println("Cloudinary Android Upload Progress: $progress%")
                     }
 
                     override fun onSuccess(requestId: String, resultData: Map<*, *>?) {
@@ -40,14 +38,12 @@ actual class ImageUploader {
                     }
 
                     override fun onReschedule(requestId: String, error: ErrorInfo?) {
-                        // Optional: Log reschedule
                         println("Cloudinary Android Upload Rescheduled: $requestId, Error: ${error?.description}")
                     }
                 })
 
-            uploadRequest.dispatch() // Start the upload
+            uploadRequest.dispatch()
 
-            // If the coroutine is cancelled, try to cancel the upload
             continuation.invokeOnCancellation {
                 MediaManager.get().cancelRequest(uploadRequest.requestId)
                 println("Cloudinary Android Upload Cancelled: ${uploadRequest.requestId}")

@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 
 class UserViewModel(
     private val useCases: UserUseCases,
-    private val firebaseRepository: FirebaseRepository
 ): BaseViewModel() {
     private val _saveState = MutableStateFlow<SaveState>(SaveState.Idle)
     val saveState: StateFlow<SaveState> = _saveState.asStateFlow()
@@ -21,7 +20,7 @@ class UserViewModel(
 
     fun onSignIn(email: String, password: String) {
         scope.launch {
-            _saveState.value = SaveState.Saving // Indicate saving is in progress
+            _saveState.value = SaveState.Saving
 
             when (val result = useCases.signIn(email, password)) {
                 is Result.Success -> {
@@ -36,7 +35,7 @@ class UserViewModel(
 
     fun onSignUp(email: String, password: String, name: String) {
         scope.launch {
-            _saveState.value = SaveState.Saving // Indicate saving is in progress
+            _saveState.value = SaveState.Saving
 
             when (val result = useCases.signUp(email, password, name)) {
                 is Result.Success -> {
