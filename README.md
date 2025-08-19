@@ -54,5 +54,6 @@ This is a **Kotlin Multiplatform (KMP)** project. The main module layout is:
 - Connect the composeApp shared logic.
 
 
-
-
+## Design
+The app's design is available on DRIVE: [View here](https://drive.google.com/file/d/1smp1zKe6_BhxUputIAwQAU6BlzdE1xJp/view?usp=sharing)  
+And on Figma: [View here](https://www.figma.com/board/0kVkL4V89N8KwLKAig0GKn/FigJam-basics?node-id=0-1&t=hPdegU0FgXzdBmc6-1 )
