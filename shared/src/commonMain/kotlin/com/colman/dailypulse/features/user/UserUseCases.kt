@@ -6,5 +6,4 @@ import com.colman.dailypulse.domian.user.OnSignUp
 class UserUseCases (
     val signIn: OnSignIn,
     val signUp: OnSignUp,
-//    val signOut: OnSignOut,
 )

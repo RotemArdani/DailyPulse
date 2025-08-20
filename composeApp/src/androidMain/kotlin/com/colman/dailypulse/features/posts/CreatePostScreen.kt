@@ -126,7 +126,6 @@ fun CreatePostScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Image picker card
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,7 +147,6 @@ fun CreatePostScreen(
                 }
             }
 
-            // Delete button under image if present
             if (imageUrl != null) {
                 TextButton(
                     onClick = { viewModel.clearImage() },

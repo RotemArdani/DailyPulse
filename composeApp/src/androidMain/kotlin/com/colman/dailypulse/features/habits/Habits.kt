@@ -237,7 +237,6 @@ fun HabitsContent(
                                 }
                             }
 
-                            // 🎉 emoji on its own line
                             Text(
                                 text = "🎉",
                                 style = MaterialTheme.typography.headlineLarge,
@@ -247,7 +246,6 @@ fun HabitsContent(
 
                             Spacer(Modifier.height(8.dp))
 
-                            // Title below the emoji
                             Text(
                                 text = "You have created a new habit!",
                                 style = MaterialTheme.typography.headlineSmall,

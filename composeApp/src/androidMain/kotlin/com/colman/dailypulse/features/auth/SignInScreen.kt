@@ -10,9 +10,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.colman.dailypulse.features.user.UserViewModel
-import com.colman.dailypulse.features.habits.SaveState // Assuming SaveState is reused
+import com.colman.dailypulse.features.habits.SaveState
 import com.colman.dailypulse.utils.LocalSnackbarController
-import org.koin.androidx.compose.koinViewModel // If using Koin
+import org.koin.androidx.compose.koinViewModel
 import com.colman.dailypulse.ui.components.AppHeader
 
 
@@ -34,11 +34,10 @@ fun SignInScreen(
                 onSignInSuccess()
                 viewModel.resetSaveState()
             }
-            is SaveState.Error -> {
+            else -> {
                 snackbarController.showMessage("Unable To Sign In")
                 viewModel.resetSaveState()
             }
-            else -> { /* Idle or Saving */ }
         }
     }
 
